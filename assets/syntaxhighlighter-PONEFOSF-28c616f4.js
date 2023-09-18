@@ -1,0 +1,2 @@
+import{S as l,c as n,s as d}from"./DocsRenderer-3PUGWF3O-fb9f6a63.js";import"./iframe-a1d284a9.js";import"../sb-preview/runtime.js";import"./index-928ed2fb.js";import"./_commonjsHelpers-725317a4.js";import"./_getPrototype-d2764d10.js";import"./emotion-use-insertion-effect-with-fallbacks.browser.esm-5cac086b.js";import"./index-d37d4223.js";import"./index-356e4a49.js";export{l as SyntaxHighlighter,n as createCopyToClipboardFunction,d as default};
+//# sourceMappingURL=syntaxhighlighter-PONEFOSF-28c616f4.js.map
