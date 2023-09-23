@@ -1,18 +1,57 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import type {
+  ComponentPropsWithoutRef,
+  ReactElement,
+  CSSProperties,
+} from 'react';
 import { Flex } from '../..';
 import {
-  dividerStyle,
-  pan1Style,
-  pan2Style,
+  defaultDividerStyle,
+  pane1Style,
+  pane2Style,
   splitPaneContainerStyle,
 } from './SplitPane.styles';
 
-interface SplitPaneProps {
-  maxWidth?: number;
-  minWidth?: number;
+export interface SplitPaneProps extends ComponentPropsWithoutRef<'div'> {
+  /**
+   * SplitPane을 적용하는 컴포넌트의 너비
+   *
+   * @default '100%'
+   */
+  width?: string;
+  /**
+   * 왼쪽 pane의 최대 너비
+   * 숫자만 입력 가능하며 px로 고정됩니다.
+   *
+   * @default 500
+   */
+  paneMaxWidth?: number;
+  /**
+   * 왼쪽 pane의 최소 너비
+   * 숫자만 입력 가능하며 px로 고정됩니다.
+   *
+   * @default 100
+   */
+  paneMinWidth?: number;
+  /**
+   * 가운데 분할선의 스타일
+   * 선의 색과 굵이 등을 조절하고 싶다면 'borderRight' 속성을 선언해야 기본 선에 덮어씌워집니다.
+   */
+  dividerStyle?: CSSProperties;
+  /**
+   * 분할되는 2개의 자식 컴포넌트
+   */
+  children: ReactElement[];
 }
 
-const SplitPane = ({ maxWidth = 400, minWidth = 50 }: SplitPaneProps) => {
+const SplitPane = ({
+  width = '100%',
+  paneMaxWidth = 500,
+  paneMinWidth = 100,
+  dividerStyle,
+  children,
+  ...attributes
+}: SplitPaneProps) => {
   const [isActive, setIsActive] = useState(false);
   const leftPaneRef = useRef<HTMLDivElement | null>(null);
 
@@ -25,13 +64,12 @@ const SplitPane = ({ maxWidth = 400, minWidth = 50 }: SplitPaneProps) => {
       if (!isActive) return;
 
       if (leftPaneRef.current) {
-        console.log(e.clientX);
-        if (e.clientX < minWidth || e.clientX > maxWidth) return;
+        if (e.clientX < paneMinWidth || e.clientX > paneMaxWidth) return;
 
         leftPaneRef.current.style.width = `${e.clientX}px`;
       }
     },
-    [isActive, maxWidth, minWidth]
+    [isActive, paneMaxWidth, paneMinWidth]
   );
 
   useEffect(() => {
@@ -54,10 +92,23 @@ const SplitPane = ({ maxWidth = 400, minWidth = 50 }: SplitPaneProps) => {
   }, [handleMouseMove]);
 
   return (
-    <Flex dir="row" css={splitPaneContainerStyle} onMouseMove={handleMouseMove}>
-      <div draggable={false} css={pan1Style} ref={leftPaneRef}></div>
-      <div css={dividerStyle} onMouseDown={handleMouseDown} />
-      <div draggable={false} css={pan2Style}></div>
+    <Flex
+      css={splitPaneContainerStyle({ width })}
+      onMouseMove={handleMouseMove}
+      {...attributes}
+      dir="row"
+    >
+      <div draggable={false} css={pane1Style} ref={leftPaneRef}>
+        {children[0]}
+      </div>
+      <div
+        css={defaultDividerStyle}
+        style={dividerStyle}
+        onMouseDown={handleMouseDown}
+      />
+      <div draggable={false} css={pane2Style}>
+        {children[1]}
+      </div>
     </Flex>
   );
 };

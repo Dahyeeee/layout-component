@@ -13,14 +13,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
   render: () => {
-    return <SplitPane />;
+    return (
+      <div style={{ height: '500px', border: '1px solid black' }}>
+        <SplitPane width="500px">
+          <div>a</div>
+          <div>b</div>
+        </SplitPane>
+      </div>
+    );
   },
-  // args: {
-  //   maxWidth: '100%',
-  //   minWidth: '100px',
-  // },
-
-  // argTypes: {
-  //   as: { control: 'select', options: ['section', 'dialog', 'div', 'span'] },
-  // },
+  args: {
+    children: [<div>a</div>, <div>b</div>],
+  },
 };
