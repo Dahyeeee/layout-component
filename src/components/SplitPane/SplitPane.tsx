@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import type { MouseEvent as ReactMouseEvent } from 'react';
 import { Flex } from '../..';
 import {
   dividerStyle,
@@ -14,27 +13,25 @@ interface SplitPaneProps {
 }
 
 const SplitPane = ({ maxWidth = 400, minWidth = 50 }: SplitPaneProps) => {
-  const [dividerYLocation, setDividerYLocation] = useState<number | null>(null);
-  const dividerRef = useRef(null);
+  const [isActive, setIsActive] = useState(false);
   const leftPaneRef = useRef<HTMLDivElement | null>(null);
 
-  const handleMouseDown = (e: ReactMouseEvent) => {
-    setDividerYLocation(e.clientY);
+  const handleMouseDown = () => {
+    setIsActive(true);
   };
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (dividerYLocation === null) return;
+      if (!isActive) return;
 
-      requestAnimationFrame(() => {
-        if (leftPaneRef.current) {
-          if (e.offsetX < minWidth || e.offsetX > maxWidth) return;
+      if (leftPaneRef.current) {
+        console.log(e.clientX);
+        if (e.clientX < minWidth || e.clientX > maxWidth) return;
 
-          leftPaneRef.current.style.width = `${e.offsetX}px`;
-        }
-      });
+        leftPaneRef.current.style.width = `${e.clientX}px`;
+      }
     },
-    [dividerYLocation, maxWidth, minWidth]
+    [isActive, maxWidth, minWidth]
   );
 
   useEffect(() => {
@@ -45,29 +42,22 @@ const SplitPane = ({ maxWidth = 400, minWidth = 50 }: SplitPaneProps) => {
   }, []);
 
   const handleMouseUp = () => {
-    console.log('mouseUP');
-    setDividerYLocation(null);
+    setIsActive(false);
   };
 
   useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [handleMouseMove]);
 
   return (
-    <Flex dir="row" css={splitPaneContainerStyle}>
-      <div draggable={false} css={pan1Style} ref={leftPaneRef}>
-        pan1
-      </div>
-      <div css={dividerStyle} ref={dividerRef} onMouseDown={handleMouseDown} />
-      <div draggable={false} css={pan2Style}>
-        pan2
-      </div>
+    <Flex dir="row" css={splitPaneContainerStyle} onMouseMove={handleMouseMove}>
+      <div draggable={false} css={pan1Style} ref={leftPaneRef}></div>
+      <div css={dividerStyle} onMouseDown={handleMouseDown} />
+      <div draggable={false} css={pan2Style}></div>
     </Flex>
   );
 };
